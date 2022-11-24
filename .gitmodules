@@ -1,0 +1,3 @@
+[submodule "fasterrcnn-pytorch-training-pipeline"]
+	path = fasterrcnn-pytorch-training-pipeline
+	url = https://github.com/sovit-123/fasterrcnn-pytorch-training-pipeline
