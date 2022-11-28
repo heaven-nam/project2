@@ -15,8 +15,12 @@ ROOT_DIR = os.path.abspath("../")
 sys.path.append(ROOT_DIR)
 dataset_dir = '../'
 
+import mrcnn
+
 from mrcnn.config import Config
 from mrcnn import model as modellib, utils
+from mrcnn import visualize
+from mrcnn.visualize import display_instances
 
 DEFAULT_LOGS_DIR = os.path.join(ROOT_DIR, 'logs')
 
@@ -32,11 +36,11 @@ class MyConfig(Config):
 
     IMAGES_PER_GPU = 2
 
-    STEPS_PER_EPOCH = 100
+    STEPS_PER_EPOCH = 1000
 
     VALIDATION_STEPS = 50
 
-    NUM_CLASSES = 4 # 21 + 1(background)
+    NUM_CLASSES = 22 # 21 + 1(background)
 
     IMAGE_RESIZE_MODE = "square"
     IMAGE_MIN_DIM = 800
@@ -49,35 +53,38 @@ class MyConfig(Config):
 class BuildingDataset(utils.Dataset):
 
     def load_building(self,dataset_dir,subset):
-        self.add_class('building',1,'균열_우수')
-        self.add_class('building',2,'균열_보통')
-        self.add_class('building',3,'균열_불량')
-        self.add_class('building',4,'박리,박락_우수')
-        self.add_class('building',5,'박리,박락_보통')
-        self.add_class('building',6,'박리,박락_불량')
-        self.add_class('building',7,'철근 노출_우수')
-        self.add_class('building',8,'철근_노출_보통')
-        self.add_class('building',9,'철근_노출_불량')
-        self.add_class('building',10,'대지_우수')
-        self.add_class('building',11,'대지_보통')
-        self.add_class('building',12,'대지_불량')
-        self.add_class('building',13,'마감_우수')
-        self.add_class('building',14,'마감_보통')
-        self.add_class('building',15,'마감_불량')
-        self.add_class('building',16,'창호_우수')
-        self.add_class('building',17,'창호_보통')
-        self.add_class('building',18,'창호_불량')
-        self.add_class('building',19,'생활_우수')
-        self.add_class('building',20,'생활_보통')
-        self.add_class('building',21,'생활_불량')
+        # self.add_class('building',1,'Good')
+        # self.add_class('building',2,'Normal')
+        # self.add_class('building',3,'Bad')
+        self.add_class('building',1,'Crack_Good')
+        self.add_class('building',2,'Crack_Normal')
+        self.add_class('building',3,'Crack_Bad')
+        self.add_class('building',4,'Spalling_Good')
+        self.add_class('building',5,'Spalling_Normal')
+        self.add_class('building',6,'Spalling_Bad')
+        self.add_class('building',7,'exposure of rebar_Good')
+        self.add_class('building',8,'exposure of rebar_Normal')
+        self.add_class('building',9,'exposure of rebar_Bad')
+        self.add_class('building',10,'Ground_Good')
+        self.add_class('building',11,'Ground_Normal')
+        self.add_class('building',12,'Ground_Bad')
+        self.add_class('building',13,'finish_Good')
+        self.add_class('building',14,'finish_Normal')
+        self.add_class('building',15,'finish_Bad')
+        self.add_class('building',16,'Window_Good')
+        self.add_class('building',17,'Window_Normal')
+        self.add_class('building',18,'Windows_Bad')
+        self.add_class('building',19,'Living_Good')
+        self.add_class('building',20,'Living_Normal')
+        self.add_class('building',21,'Living_Bad')
         
 
         assert subset in ['train','validation']
         if subset == 'train':
-            json_dir = os.path.join(dataset_dir,'train_annotation.json')
+            json_dir = os.path.join(r'../','train_annotation.json')
             dataset_dir = os.path.join(dataset_dir,'train')
         else:
-            json_dir = os.path.join(dataset_dir,'validation_annotation.json')
+            json_dir = os.path.join(r'../','validation_annotation.json')
             dataset_dir = os.path.join(dataset_dir,'validation')
             
         annotations = json.load(open(json_dir, encoding='utf8'))
@@ -111,33 +118,19 @@ class BuildingDataset(utils.Dataset):
         for annotation in annotations:
             class_id = annotation['Class_ID']
             class_ids.append(class_id)
-            m = np.zeros([info['height'], info['width'],1])
+            m = np.zeros([info['height'], info['width']])
             bbox = annotation['bbox']
             xm, ym, xM, yM = bbox[0], bbox[1], bbox[2], bbox[3]
             start = (ym, xm)
             extent = (yM-ym, xM-xm)
             rr, cc = skimage.draw.rectangle(start, extent=extent, shape=m.shape)
-            m[rr,cc,1] = 1
+            m[rr,cc] = 1
             instance_masks.append(m)
         
         mask = np.stack(instance_masks, axis=2).astype(np.bool)
         class_ids = np.array(class_ids, dtype=np.int32)
 
         return mask, class_ids
-
-        # mask = np.zeros([info['height'], info['width'], len(info['bbox'])], dtype = np.uint8)
-        # for i, bbox in enumerate(info['bbox']):
-        #     xm,ym,xM,yM = bbox[0], bbox[1], bbox[2], bbox[3]
-        #     xs = np.array([xm+1,xm+1,xM-1,xM-1])
-        #     ys = np.array([ym-1,yM-1,yM-1,ym-1])
-        #     rr, cc = skimage.draw.polygon(xs,ys)
-        #     try:
-        #         mask[cc,rr,i] = 1
-        #     except:
-        #         continue
-        # # return mask.astype(np.bool), np.ones([mask.shape[-1]], dtype=np.int32)
-        # num_ids = np.array(num_ids, dtype=np.uint8)
-        # return mask.astype(bool), num_ids
 
     def image_reference(self, image_id):
         info = self.image_info[image_id]
@@ -157,36 +150,32 @@ def train(model):
 
     model.train(dataset_train, dataset_val,
                 learning_rate=config.LEARNING_RATE,
-                epochs = 40,
-                layers='heads')
-
-def color_splash(image, mask):
-    gray = skimage.color.gray2rgb(skimage.color.rgb2gray(image))*255
-    
-    if mask.shape[-1] > 0:
-        mask = (np.sum(mask, -1, keepdims=True) >= -1)
-        splash = np.where(mask, image, gray).astype(np.uint8)
-    else:
-        splash = gray.astype(np.uint8)
-
-    return splash
+                epochs = 30,
+                layers='all')
 
 def detect_and(model, image_path=None):
-    
+    image = skimage.io.imread(args.image)
+
+    # class_names
+    class_names = ['BG','Crack_Good','Crack_Normal','Crack_Bad','Spalling_Good','Spalling_Normal','Spalling_Bad','exposure of rebar_Good','exposure of rebar_Normal','exposure of rebar_Bad','Ground_Good','Ground_Normal','Ground_Bad','finish_Good','finish_Normal','finish_Bad','Window_Good','Window_Normal','Window_Bad','Living_Good','Living_Normal','Living_Bad']
+    # class_names = ['BG','Good','Normal','Bad']
+
     if image_path:
         image = skimage.io.imread(args.image)
-        r = model.detect([image],verbose=1)[0]
-        print(type(r), r.shape)
-        print(r)
+        # image = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
 
-        splash = color_splash(image, r['masks'])
+        r = model.detect([image],verbose=0)
+        r = r[0]
+        print(r.keys())
 
-        file_name = "Test_1.png"
-        skimage.io.imsave(file_name, splash)
+        mrcnn.visualize.display_instances(image=image,
+                                          class_names=class_names,
+                                          boxes=r['rois'],
+                                          masks = r['masks'],
+                                          class_ids=r['class_ids'],
+                                          scores=r['scores'])
     else:
         print('insert image')
-    # skimage.io.imshow(image_path, splash)
-    # skimage.io.show()
 
 
 
