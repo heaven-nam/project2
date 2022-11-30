@@ -4,3 +4,6 @@
 [submodule "RefineDet"]
 	path = RefineDet
 	url = https://github.com/sfzhang15/RefineDet.git
+[submodule "refinedet.pytorch"]
+	path = refinedet.pytorch
+	url = https://github.com/dd604/refinedet.pytorch
