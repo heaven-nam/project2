@@ -7,3 +7,6 @@
 [submodule "refinedet.pytorch"]
 	path = refinedet.pytorch
 	url = https://github.com/dd604/refinedet.pytorch
+[submodule "Aged-Building/models/detr"]
+	path = Aged-Building/models/detr
+	url = https://github.com/facebookresearch/detr

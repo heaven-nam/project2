@@ -299,7 +299,7 @@ MMDetection 是一个基于 PyTorch 的目标检测开源工具箱。它是 [Ope
   </tbody>
 </table>
 
-我们在[基于 MMDetection 的项目](./docs/zh_cn/projects.md)中列举了一些其他的支持的算法。
+我们在[基于 MMDetection 的项目](docs/zh_cn/projects.md)中列举了一些其他的支持的算法。
 
 ## 常见问题
 

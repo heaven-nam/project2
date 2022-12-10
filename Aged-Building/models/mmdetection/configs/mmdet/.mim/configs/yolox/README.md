@@ -31,8 +31,8 @@ In this report, we present some experienced improvements to YOLO series, forming
 
 | Backbone | size | Lr schd | Mem (GB) | box AP |                    Config                     |                                                              Download                                                               |
 | :------: | :--: | :-----: | :------: | :----: | :-------------------------------------------: | :---------------------------------------------------------------------------------------------------------------------------------: |
-| YOLOX-l  | 1024 |   24e   |    -     |  37.8  | [config](./yolox_l_1024_fp16_4x4_24e_coco.py) | [model](https://github.com/shinya7y/weights/releases/download/v1.0.0/yolox_l_1024_fp16_4x4_24e_coco_20220801_epoch_24-c2e31c2a.pth) |
-| YOLOX-l  | 1024 |   36e   |    -     |  41.1  | [config](./yolox_l_1024_fp16_4x4_36e_coco.py) | [model](https://github.com/shinya7y/weights/releases/download/v1.0.0/yolox_l_1024_fp16_4x4_36e_coco_20220719_epoch_36-2145a442.pth) |
+| YOLOX-l  | 1024 |   24e   |    -     |  37.8  | [config](yolox_l_1024_fp16_4x4_24e_coco.py) | [model](https://github.com/shinya7y/weights/releases/download/v1.0.0/yolox_l_1024_fp16_4x4_24e_coco_20220801_epoch_24-c2e31c2a.pth) |
+| YOLOX-l  | 1024 |   36e   |    -     |  41.1  | [config](yolox_l_1024_fp16_4x4_36e_coco.py) | [model](https://github.com/shinya7y/weights/releases/download/v1.0.0/yolox_l_1024_fp16_4x4_36e_coco_20220719_epoch_36-2145a442.pth) |
 
 ## Citation
 
