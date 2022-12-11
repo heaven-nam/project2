@@ -10,3 +10,9 @@
 [submodule "Aged-Building/models/detr"]
 	path = Aged-Building/models/detr
 	url = https://github.com/facebookresearch/detr
+[submodule "Aged-Building/ReactNativeApp-for-DL"]
+	path = Aged-Building/ReactNativeApp-for-DL
+	url = https://github.com/twinklespirit/ReactNativeApp-for-DL
+[submodule "ReactNativeApp-for-DL"]
+	path = ReactNativeApp-for-DL
+	url = https://github.com/twinklespirit/ReactNativeApp-for-DL/
