@@ -47,4 +47,4 @@ def detc(cfg, img, chk):
     res = dict()
     res["image"] = kb64
     res["class"] = rc
-    return json.dumps(res)
+    return res

@@ -6,7 +6,7 @@ import numpy as np
 import pycocotools.mask as mask_util
 from matplotlib.collections import PatchCollection
 from matplotlib.patches import Polygon
-
+import matplotlib
 from mmdet.core.evaluation.panoptic_utils import INSTANCE_OFFSET
 from ..mask.structures import bitmap_to_polygon
 from ..utils import mask2ndarray
@@ -18,7 +18,7 @@ __all__ = [
 ]
 
 EPS = 1e-2
-
+matplotlib.use('Agg')
 
 def color_val_matplotlib(color):
     """Convert various input in BGR order to normalized RGB matplotlib color

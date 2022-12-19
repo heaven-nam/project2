@@ -335,8 +335,8 @@ class BaseDetector(BaseModule, metaclass=ABCMeta):
             else:
                 segms = np.stack(segms, axis=0)
         # if out_file specified, do not show image in window
-        if out_file is not None:
-            show = False
+        # if out_file is not None:
+        show = False
         # draw bounding boxes
         img = imshow_det_bboxes(
             img,
@@ -351,10 +351,10 @@ class BaseDetector(BaseModule, metaclass=ABCMeta):
             thickness=thickness,
             font_size=font_size,
             win_name=win_name,
-            show=show,
+            show=False,
             wait_time=wait_time,
-            out_file=out_file)
-        print('img in base.py', type(img))
+            out_file=None)
+        # print('img in base.py', type(img))
         img = Image.fromarray(img)
         # print(type(img))
         # img_2.show()
